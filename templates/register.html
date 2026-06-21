@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Create Account — FinBuddy{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="brand-icon">₹</span>
+      <h1 class="brand-name">FinBuddy</h1>
+    </div>
+    <p class="auth-subtitle">Create your account</p>
+
+    <form action="/register" method="POST" class="auth-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               placeholder="Choose a username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="pin">PIN <span class="field-hint">(4–6 digits)</span></label>
+        <input type="password" id="pin" name="pin"
+               placeholder="e.g. 1234" inputmode="numeric"
+               minlength="4" maxlength="6" autocomplete="new-password" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a href="/login">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

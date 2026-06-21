@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — FinBuddy{% endblock %}
+
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">₹</span>
+      <span class="brand-name">FinBuddy</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/chat" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Chat
+      </a>
+      <a href="/dashboard" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Dashboard
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="user-badge">{{ username }}</span>
+      <form action="/logout" method="POST">
+        <button type="submit" class="btn-logout">Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="dashboard-main">
+    <div class="dashboard-header">
+      <h2>Dashboard</h2>
+      <p class="dashboard-sub">Your financial overview</p>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-card">
+        <p class="stat-label">This Month — Income</p>
+        <p class="stat-value income" id="statIncome">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">This Month — Expenses</p>
+        <p class="stat-value expense" id="statExpense">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Net Savings</p>
+        <p class="stat-value" id="statNet">—</p>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">Income vs Expenses</h3>
+        <canvas id="trendChart" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-title">Spending by Category</h3>
+        <canvas id="categoryChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="table-card">
+      <h3 class="chart-title">Recent Transactions</h3>
+      <table class="txn-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="txnTableBody">
+          <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

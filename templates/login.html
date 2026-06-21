@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sign In — FinBuddy{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="brand-icon">₹</span>
+      <h1 class="brand-name">FinBuddy</h1>
+    </div>
+    <p class="auth-subtitle">Your AI finance companion</p>
+
+    <form action="/login" method="POST" class="auth-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               placeholder="Enter your username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="pin">PIN</label>
+        <input type="password" id="pin" name="pin"
+               placeholder="4–6 digit PIN" inputmode="numeric"
+               maxlength="6" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+
+    <p class="auth-footer">
+      New here? <a href="/register">Create an account</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

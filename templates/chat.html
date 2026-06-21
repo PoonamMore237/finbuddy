@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Chat — FinBuddy{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">₹</span>
+      <span class="brand-name">FinBuddy</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/chat" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Chat
+      </a>
+      <a href="/dashboard" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Dashboard
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="user-badge">{{ username }}</span>
+      <form action="/logout" method="POST">
+        <button type="submit" class="btn-logout">Sign out</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="chat-main">
+    <div class="chat-header">
+      <h2>FinBuddy</h2>
+      <p class="chat-header-sub">Ask me to track expenses, explain finance terms, or review your spending.</p>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- Welcome message -->
+      <div class="message bot">
+        <div class="message-bubble">
+          👋 Hey <strong>{{ username }}</strong>! I'm FinBuddy.<br>
+          Tell me about an expense (e.g. <em>"spent ₹500 on groceries"</em>),
+          ask a finance question, or type <em>"show my summary"</em>.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div id="typingIndicator" class="typing-indicator hidden">
+        <span></span><span></span><span></span>
+      </div>
+      <form class="chat-form" id="chatForm">
+        <input type="text" id="messageInput" class="chat-input"
+               placeholder="Type a message…" autocomplete="off" />
+        <button type="submit" class="btn btn-send" id="sendBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+    </div>
+  </main>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/chat.js"></script>
+{% endblock %}
