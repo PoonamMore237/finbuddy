@@ -33,9 +33,17 @@ from core.knowledge import search_knowledge
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
-    raise RuntimeError("GEMINI_API_KEY is missing in .env")
+import streamlit as st
+
+load_dotenv()
+
+GEMINI_API_KEY = (
+    os.getenv("GEMINI_API_KEY")
+    or st.secrets.get("GEMINI_API_KEY", "")
+)
+
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY is missing")
 
 MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 client = genai.Client(api_key=API_KEY)
