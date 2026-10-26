@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — FinBuddy{% endblock %}
+{% block title %}Dashboard & Analytics — FinBuddy{% endblock %}
 
 {% block head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -8,85 +8,324 @@
 {% block body %}
 <div class="app-layout">
 
+  <!-- Mobile Top Bar -->
+  <div class="mobile-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="brand-icon" style="width:32px;height:32px;font-size:16px;">₹</span>
+      <span class="brand-name" style="font-size:17px;">FinBuddy</span>
+    </div>
+    <button class="btn-menu" id="mobileMenuBtn" aria-label="Toggle Navigation">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <span class="brand-icon">₹</span>
-      <span class="brand-name">FinBuddy</span>
+      <div class="brand-info">
+        <span class="brand-name">FinBuddy</span>
+        <span class="brand-badge">GenAI Copilot</span>
+      </div>
     </div>
+
     <nav class="sidebar-nav">
       <a href="/chat" class="nav-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        Chat
+        AI Copilot
       </a>
       <a href="/dashboard" class="nav-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        Dashboard
+        Analytics
       </a>
     </nav>
+
     <div class="sidebar-footer">
-      <span class="user-badge">{{ username }}</span>
+      <div class="user-badge">
+        <div class="user-avatar">{{ username[0]|upper }}</div>
+        <span class="user-name">{{ username }}</span>
+      </div>
       <form action="/logout" method="POST">
-        <button type="submit" class="btn-logout">Sign out</button>
+        <button type="submit" class="btn-logout">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Sign Out
+        </button>
       </form>
     </div>
   </aside>
 
-  <!-- Main content -->
+  <!-- Main Dashboard Content -->
   <main class="dashboard-main">
     <div class="dashboard-header">
-      <h2>Dashboard</h2>
-      <p class="dashboard-sub">Your financial overview</p>
+      <div>
+        <h2>Financial Intelligence Dashboard</h2>
+        <p class="dashboard-sub">Live expense analytics, AI health audit, budget monitoring & wealth projection</p>
+      </div>
+
+      <div class="dashboard-header-actions">
+        <button type="button" class="btn-primary" id="btnOpenAudit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          Run AI Health Audit
+        </button>
+        <button type="button" class="btn-secondary" id="btnOpenAddTxn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add Transaction
+        </button>
+        <a href="/api/export/csv" class="btn-secondary" title="Export transactions to CSV" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export CSV
+        </a>
+      </div>
+    </div>
+
+    <!-- AI Financial Health Card -->
+    <div class="health-card" id="healthCard">
+      <div class="health-left">
+        <div class="score-gauge">
+          <svg width="80" height="80" viewBox="0 0 36 36">
+            <path stroke="rgba(255,255,255,0.08)" stroke-width="3.5" fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path id="scoreGaugePath" stroke="var(--accent)" stroke-width="3.5" stroke-dasharray="0, 100" stroke-linecap="round" fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <span class="score-text" id="scoreText">--</span>
+        </div>
+        <div class="health-meta">
+          <h3>
+            Financial Health Diagnostic
+            <span class="health-rating-badge" id="ratingBadge">Calculating...</span>
+          </h3>
+          <p id="healthSummaryText">Analyzing transaction history, savings rate, and category budget compliance…</p>
+        </div>
+      </div>
+      <button type="button" class="btn-secondary" id="btnViewAuditDetails" style="font-size:13px;">
+        View AI Action Plan →
+      </button>
     </div>
 
     <!-- Stat cards -->
-    <div class="stat-grid" id="statGrid">
+    <div class="stat-grid">
       <div class="stat-card">
         <p class="stat-label">This Month — Income</p>
-        <p class="stat-value income" id="statIncome">—</p>
+        <p class="stat-value income" id="statIncome">₹0</p>
+        <p class="stat-footer">Total inflows for active period</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">This Month — Expenses</p>
-        <p class="stat-value expense" id="statExpense">—</p>
+        <p class="stat-value expense" id="statExpense">₹0</p>
+        <p class="stat-footer">Total outflows across all categories</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Net Savings</p>
-        <p class="stat-value" id="statNet">—</p>
+        <p class="stat-value" id="statNet">₹0</p>
+        <p class="stat-footer" id="statNetLabel">Income minus expenses</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Savings Rate</p>
+        <p class="stat-value" id="statSavingsRate" style="color:#38bdf8;">0%</p>
+        <p class="stat-footer">Target: >20% (50/30/20 rule)</p>
+      </div>
+    </div>
+
+    <!-- Category Budgets Section -->
+    <div class="budget-section">
+      <div class="section-header">
+        <h3 class="section-title">Category Budgets & Spending Limits</h3>
+        <button type="button" class="btn-secondary" id="btnOpenSetBudget" style="padding:6px 12px;font-size:12.5px;">
+          + Set / Edit Budget
+        </button>
+      </div>
+      <div class="budget-grid" id="budgetGrid">
+        <p style="color:var(--text-muted);font-size:13px;">No category limits configured yet. Click "+ Set / Edit Budget" or ask FinBuddy in chat!</p>
       </div>
     </div>
 
     <!-- Charts -->
     <div class="chart-grid">
       <div class="chart-card">
-        <h3 class="chart-title">Income vs Expenses</h3>
-        <canvas id="trendChart" height="220"></canvas>
+        <h3 class="chart-title">Income vs Expense Trend</h3>
+        <canvas id="trendChart" height="230"></canvas>
       </div>
       <div class="chart-card">
-        <h3 class="chart-title">Spending by Category</h3>
-        <canvas id="categoryChart" height="220"></canvas>
+        <h3 class="chart-title">Monthly Spending by Category</h3>
+        <canvas id="categoryChart" height="230"></canvas>
       </div>
     </div>
 
-    <!-- Recent transactions -->
+    <!-- Wealth & SIP Compound Simulator -->
+    <div class="sim-card">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Interactive Wealth & SIP Compound Simulator</h3>
+          <p style="color:var(--text-muted);font-size:12.5px;margin-top:2px;">Project how systematic monthly investments grow with the power of compound interest</p>
+        </div>
+      </div>
+
+      <div class="sim-controls-grid">
+        <div class="slider-group">
+          <div class="slider-label-row">
+            <span>Monthly Investment</span>
+            <span class="slider-val" id="valMonthly">₹10,000</span>
+          </div>
+          <input type="range" id="sliderMonthly" min="1000" max="100000" step="1000" value="10000" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label-row">
+            <span>Expected Return (Annual)</span>
+            <span class="slider-val" id="valReturn">12%</span>
+          </div>
+          <input type="range" id="sliderReturn" min="6" max="22" step="0.5" value="12" />
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label-row">
+            <span>Time Horizon</span>
+            <span class="slider-val" id="valYears">10 Years</span>
+          </div>
+          <input type="range" id="sliderYears" min="1" max="30" step="1" value="10" />
+        </div>
+      </div>
+
+      <div class="sim-results-grid">
+        <div class="sim-stat-box">
+          <p>Total Invested</p>
+          <p id="resInvested">₹12,00,000</p>
+        </div>
+        <div class="sim-stat-box">
+          <p>Estimated Wealth Gain</p>
+          <p id="resWealthGain" style="color:var(--income);">₹11,23,391</p>
+        </div>
+        <div class="sim-stat-box">
+          <p>Projected Future Value</p>
+          <p id="resFutureValue" style="color:#38bdf8;">₹23,23,391</p>
+        </div>
+        <div class="sim-stat-box">
+          <p>Inflation Adjusted (6%)</p>
+          <p id="resRealValue" style="color:var(--warning);">₹12,97,364</p>
+        </div>
+      </div>
+
+      <div class="sim-ai-insight" id="simInsightText">
+        💡 <strong>Compound Growth Insight:</strong> At 12% expected return, your wealth gain will surpass your total invested principal in year 9. Compounding accelerates exponentially in later years!
+      </div>
+    </div>
+
+    <!-- Recent Transactions Table -->
     <div class="table-card">
-      <h3 class="chart-title">Recent Transactions</h3>
-      <table class="txn-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody id="txnTableBody">
-          <tr><td colspan="5" class="empty-state">Loading…</td></tr>
-        </tbody>
-      </table>
+      <div class="table-toolbar">
+        <div>
+          <h3 class="chart-title">Transaction Ledger</h3>
+          <span style="color:var(--text-muted);font-size:12.5px;">Manage, filter, and inspect your financial records</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="table-search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="txnSearchInput" placeholder="Search merchant, category..." />
+          </div>
+
+          <div class="filter-pills">
+            <button type="button" class="filter-btn active" data-filter="">All</button>
+            <button type="button" class="filter-btn" data-filter="expense">Expenses</button>
+            <button type="button" class="filter-btn" data-filter="income">Income</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="txn-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="txnTableBody">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading transactions…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 
+</div>
+
+<!-- Modal 1: Add Transaction Modal -->
+<div class="modal-backdrop" id="addTxnModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>➕ Add Manual Transaction</h3>
+      <button type="button" class="btn-close-modal" data-close="addTxnModal">✕</button>
+    </div>
+    <form class="modal-form" id="manualTxnForm">
+      <div class="form-group">
+        <label for="txnAmount">Amount (₹)</label>
+        <input type="number" id="txnAmount" step="0.01" min="1" placeholder="e.g. 1500" required />
+      </div>
+      <div class="form-group">
+        <label for="txnType">Type</label>
+        <select id="txnType" required>
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="txnCategory">Category</label>
+        <input type="text" id="txnCategory" placeholder="e.g. food, rent, shopping, salary, travel" required />
+      </div>
+      <div class="form-group">
+        <label for="txnDate">Date</label>
+        <input type="date" id="txnDate" required />
+      </div>
+      <div class="form-group">
+        <label for="txnDescription">Description / Notes</label>
+        <input type="text" id="txnDescription" placeholder="e.g. Dinner with team" />
+      </div>
+      <button type="submit" class="btn-primary" style="justify-content:center;margin-top:8px;">Save Transaction</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 2: Set Budget Modal -->
+<div class="modal-backdrop" id="setBudgetModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>🎯 Set Monthly Category Budget</h3>
+      <button type="button" class="btn-close-modal" data-close="setBudgetModal">✕</button>
+    </div>
+    <form class="modal-form" id="setBudgetForm">
+      <div class="form-group">
+        <label for="budgetCategory">Category</label>
+        <input type="text" id="budgetCategory" placeholder="e.g. food, shopping, entertainment, transport" required />
+      </div>
+      <div class="form-group">
+        <label for="budgetLimit">Monthly Spending Limit (₹)</label>
+        <input type="number" id="budgetLimit" step="100" min="100" placeholder="e.g. 8000" required />
+      </div>
+      <button type="submit" class="btn-primary" style="justify-content:center;margin-top:8px;">Save Budget Limit</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 3: AI Financial Health Audit Diagnostic Modal -->
+<div class="modal-backdrop" id="auditModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>⚡ AI Financial Health Audit</h3>
+      <button type="button" class="btn-close-modal" data-close="auditModal">✕</button>
+    </div>
+
+    <div id="auditModalContent">
+      <div style="text-align:center;padding:30px;color:var(--text-muted);">
+        Analyzing spending leaks and computing diagnostic recommendations…
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 

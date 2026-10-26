@@ -1,11 +1,13 @@
 """
 main.py
-FinBuddy — FastAPI entry point.
+FinBuddy — Advanced Generative AI Personal Finance Copilot.
 
 Run locally:
     uvicorn main:app --reload --port 8000
 """
 
+import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -13,26 +15,30 @@ from core.db import setup_database
 from routers.auth import router as auth_router
 from routers.api import router as api_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize DB tables and persistent indexes on startup."""
+    setup_database()
+    yield
+
+
 app = FastAPI(
     title="FinBuddy",
-    description="AI-powered personal finance assistant",
-    version="2.0.0",
+    description="Advanced Gen AI Autonomous Personal Finance Copilot",
+    version="3.0.0",
+    lifespan=lifespan,
 )
 
-# Serve CSS, JS, images from /static
+# Static asset serving
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Register routers
+# Register modular routers
 app.include_router(auth_router)
 app.include_router(api_router)
 
 
-@app.on_event("startup")
-def startup():
-    """Initialize DB tables on first run."""
-    setup_database()
-
-
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

@@ -1,33 +1,82 @@
 {% extends "base.html" %}
-{% block title %}Sign In — FinBuddy{% endblock %}
+{% block title %}Sign In — FinBuddy AI Copilot{% endblock %}
 
 {% block body %}
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <span class="brand-icon">₹</span>
-      <h1 class="brand-name">FinBuddy</h1>
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo-badge">₹</div>
+        <h1 class="auth-title">Welcome to FinBuddy</h1>
+        <p class="auth-subtitle">Your Autonomous Generative AI Financial Copilot</p>
+        
+        <div class="auth-pills-row">
+          <span class="auth-pill accent">⚡ Gemini 3.5 Flash</span>
+          <span class="auth-pill">🔒 Secure PIN</span>
+          <span class="auth-pill">📊 Live Intelligence</span>
+        </div>
+      </div>
+
+      <form action="/login" method="POST" class="auth-form" id="loginForm">
+        <div class="auth-field">
+          <div class="auth-label-row">
+            <label class="auth-label" for="username">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              Username
+            </label>
+          </div>
+          <div class="auth-input-wrapper">
+            <span class="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </span>
+            <input type="text" id="username" name="username" class="auth-input"
+                   placeholder="Enter your username" autocomplete="username" required autofocus />
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <div class="auth-label-row">
+            <label class="auth-label" for="pin">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Security PIN
+            </label>
+            <span class="auth-hint">4–6 numeric digits</span>
+          </div>
+          <div class="auth-input-wrapper">
+            <span class="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
+            <input type="password" id="pin" name="pin" class="auth-input"
+                   placeholder="••••" inputmode="numeric" maxlength="6"
+                   autocomplete="current-password" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-auth-submit" id="btnSubmit">
+          <span>Sign In to Copilot</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </form>
+
+      <div class="auth-demo-helper">
+        <span>Testing the app?</span>
+        <button type="button" class="btn-demo-fill" id="btnFillDemo">Auto-fill Demo</button>
+      </div>
+
+      <div class="auth-footer">
+        Don't have an account yet? <a href="/register">Create an account →</a>
+      </div>
     </div>
-    <p class="auth-subtitle">Your AI finance companion</p>
-
-    <form action="/login" method="POST" class="auth-form">
-      <div class="field">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username"
-               placeholder="Enter your username" autocomplete="username" required />
-      </div>
-      <div class="field">
-        <label for="pin">PIN</label>
-        <input type="password" id="pin" name="pin"
-               placeholder="4–6 digit PIN" inputmode="numeric"
-               maxlength="6" autocomplete="current-password" required />
-      </div>
-      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-    </form>
-
-    <p class="auth-footer">
-      New here? <a href="/register">Create an account</a>
-    </p>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('btnFillDemo').addEventListener('click', () => {
+    document.getElementById('username').value = 'live_tester';
+    document.getElementById('pin').value = '1234';
+    document.getElementById('btnSubmit').focus();
+  });
+</script>
 {% endblock %}
