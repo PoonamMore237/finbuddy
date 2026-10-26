@@ -46,8 +46,7 @@ if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY is missing")
 
 MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
-client = genai.Client(api_key=API_KEY)
-
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 def build_system_instruction() -> str:
     today_str = date.today().strftime("%Y-%m-%d")
